@@ -5,12 +5,13 @@ using ToDoWebApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Services to the container.
+// Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddDbContext<TodoContext>();  //DbContext as a service
+builder.Services.AddDbContext<TodoContext>();  // Add your DbContext as a service
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<FeatureToggles>(builder.Configuration.GetSection("FeatureToggles"));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -20,10 +21,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 // Ensure the database is created.

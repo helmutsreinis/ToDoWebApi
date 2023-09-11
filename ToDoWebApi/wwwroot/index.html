@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>ToDo Web API UI</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>ToDo List</h1>
+
+    <div>
+        <h2>Create ToDo</h2>
+        <input type="text" id="createTitle" placeholder="Title" />
+        <button onclick="createToDo()">Create</button>
+    </div>
+
+    <div>
+        <h2>Update ToDo</h2>
+        <input type="text" id="updateId" placeholder="ID" />
+        <input type="text" id="updateTitle" placeholder="New Title" />
+        <button onclick="updateToDo()">Update</button>
+    </div>
+
+    <div>
+        <h2>Delete ToDo</h2>
+        <input type="text" id="deleteId" placeholder="ID" />
+        <button onclick="deleteToDo()">Delete</button>
+    </div>
+
+    <div>
+        <h2>All ToDos</h2>
+        <ul id="toDoList">
+            <!-- List items will be appended here -->
+        </ul>
+    </div>
+
+    <script>
+    // Define the API endpoint
+        const apiEndpoint = 'https://localhost:7226/api/Todo';
+
+    // Function to fetch all ToDos
+    function fetchToDos() {
+      $('#toDoList').empty();
+      $.get(apiEndpoint, function(data) {
+        data.forEach(function(item) {
+          $('#toDoList').append(`<li>ID: ${item.id}, Title: ${item.title}</li>`);
+        });
+      });
+    }
+
+    // Function to create a ToDo
+    function createToDo() {
+      const title = $('#createTitle').val();
+      $.post(apiEndpoint, { title }, function() {
+        fetchToDos();
+      });
+    }
+
+    // Function to update a ToDo
+    function updateToDo() {
+      const id = $('#updateId').val();
+      const title = $('#updateTitle').val();
+      $.ajax({
+        url: `${apiEndpoint}/${id}`,
+        type: 'PUT',
+        data: JSON.stringify({ title }),
+        contentType: 'application/json',
+        success: function() {
+          fetchToDos();
+        }
+      });
+    }
+
+    // Function to delete a ToDo
+    function deleteToDo() {
+      const id = $('#deleteId').val();
+      $.ajax({
+        url: `${apiEndpoint}/${id}`,
+        type: 'DELETE',
+        success: function() {
+          fetchToDos();
+        }
+      });
+    }
+
+    // Initial fetch
+    fetchToDos();
+    </script>
+</body>
+</html>

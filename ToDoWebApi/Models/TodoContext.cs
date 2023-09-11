@@ -6,10 +6,14 @@ namespace MyTodoApp.Models
     public class TodoContext : DbContext
     {
         public DbSet<Todo> Todos { get; set; }
-
         public TodoContext(DbContextOptions<TodoContext> options)
         {
             // Ensure DB is created.
+        }
+
+        public TodoContext()
+        {
+            // Ensure database is created.
             Database.EnsureCreated();
         }
 
