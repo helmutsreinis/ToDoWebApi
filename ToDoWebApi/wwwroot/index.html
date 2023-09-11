@@ -9,7 +9,18 @@
 
     <div>
         <h2>Create ToDo</h2>
+        <label for="createId">ID:</label>
+        <input type="number" id="createId" placeholder="ID" min="1" />
+        <br>
+
+        <label for="createTitle">Title:</label>
         <input type="text" id="createTitle" placeholder="Title" />
+        <br>
+
+        <label for="isCompleted">Is Completed:</label>
+        <input type="checkbox" id="isCompleted">
+        <br>
+
         <button onclick="createToDo()">Create</button>
     </div>
 
@@ -35,8 +46,8 @@
 
     <script>
     // Define the API endpoint
-        const apiEndpoint = 'https://pichetodoitems.azurewebsites.net/api/Todo';
-
+        //const apiEndpoint = 'https://pichetodoitems.azurewebsites.net/api/Todo';
+        const apiEndpoint = 'https://localhost:7226/api/Todo';
     // Function to fetch all ToDos
     function fetchToDos() {
       $('#toDoList').empty();
@@ -48,12 +59,25 @@
     }
 
     // Function to create a ToDo
-    function createToDo() {
-      const title = $('#createTitle').val();
-      $.post(apiEndpoint, { title }, function() {
-        fetchToDos();
-      });
-    }
+        function createToDo() {
+            const id = parseInt($('#createId').val(), 10);
+            const title = $('#createTitle').val();
+            const isCompleted = $('#isCompleted').prop('checked');
+
+            $.ajax({
+                url: apiEndpoint,
+                type: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify({ id: id, title: title, isCompleted: isCompleted }),
+                success: function () {
+                    fetchToDos();
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    console.log(`Error: ${status}, ${error}`);
+                }
+            });
+        }
 
     // Function to update a ToDo
     function updateToDo() {
