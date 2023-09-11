@@ -15,11 +15,9 @@ builder.Services.Configure<FeatureToggles>(builder.Configuration.GetSection("Fea
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
