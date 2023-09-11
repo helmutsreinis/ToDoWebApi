@@ -23,6 +23,7 @@ namespace MyTodoApp.Test
                 .UseInMemoryDatabase(databaseName: "TestTodoDatabase")
                 .Options;
             _todoContext = new TodoContext(options);
+            _todoContext.Database.EnsureCreated();  // Make sure the database is created
 
             // Feature toggles
             _featureToggles = Options.Create(new FeatureToggles());
@@ -61,7 +62,7 @@ namespace MyTodoApp.Test
         {
             _featureToggles.Value.EnableTodoGet = true;
 
-            var result = _controller.Get(11);
+            var result = _controller.Get(143);
 
             Assert.IsType<NotFoundResult>(result);
         }
@@ -96,7 +97,7 @@ namespace MyTodoApp.Test
         {
             _featureToggles.Value.EnableTodoCreation = true;
             var result = _controller.Create(new Todo { Id = 1 });
-            _controller.Delete(1);
+            //_controller.Delete(1);
             Assert.IsType<BadRequestObjectResult>(result);
         }
 
@@ -104,8 +105,8 @@ namespace MyTodoApp.Test
         public void Create_ReturnsCreatedAtAction_WhenModelIsValid()
         {
             _featureToggles.Value.EnableTodoCreation = true;
-            _controller.Delete(10);
-            var result = _controller.Create(new Todo { Id = 14, Title = "Test", IsCompleted = false }) as CreatedAtActionResult;
+            _controller.Delete(1);
+            var result = _controller.Create(new Todo { Id = 1, Title = "Test", IsCompleted = false }) as CreatedAtActionResult;
 
             Assert.NotNull(result);
             Assert.Equal("Get", result.ActionName);
@@ -115,7 +116,7 @@ namespace MyTodoApp.Test
         public void Update_ReturnsBadRequest_WhenFeatureIsDisabled()
         {
             _featureToggles.Value.EnableTodoPut = false;
-            var result = _controller.Update(1, new Todo { Id = 1, Title = "Updated Test", IsCompleted = true });
+            var result = _controller.Update(1, new Todo { Id = 14, Title = "Updated Test", IsCompleted = true });
 
             Assert.IsType<BadRequestObjectResult>(result);
         }
@@ -124,7 +125,7 @@ namespace MyTodoApp.Test
         public void Update_ReturnsNotFound_WhenTodoDoesNotExist()
         {
             _featureToggles.Value.EnableTodoPut = true;
-            var result = _controller.Update(1, new Todo { Id = 1, Title = "Updated Test", IsCompleted = true });
+            var result = _controller.Update(1, new Todo { Id = 15, Title = "Updated Test", IsCompleted = true });
 
             Assert.IsType<NotFoundResult>(result);
         }
@@ -163,10 +164,10 @@ namespace MyTodoApp.Test
         public void Delete_ReturnsNoContent_WhenTodoIsDeleted()
         {
             _featureToggles.Value.EnableTodoDeletion = true;
-            _todoContext.Todos.Add(new Todo { Id = 10, Title = "Test", IsCompleted = false });
+            _todoContext.Todos.Add(new Todo { Id = 1, Title = "Test", IsCompleted = false });
             _todoContext.SaveChanges();
 
-            var result = _controller.Delete(10);
+            var result = _controller.Delete(1);
 
             Assert.IsType<NoContentResult>(result);
         }
