@@ -1,5 +1,6 @@
 # ToDoWebApi Project
-- [PoC for Todo in Azure](https://pichetodoitems.azurewebsites.net)
+- [Simple UI Wrapper in Azure](https://pichetodoitems.azurewebsites.net)
+- [Swagger UI in Azure](https://pichetodoitems.azurewebsites.net/swagger/index.html)
 
 ## Overview
 
