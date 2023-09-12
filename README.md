@@ -2,6 +2,8 @@
 - [Simple UI Wrapper in Azure](https://pichetodoitems.azurewebsites.net)
 - [Swagger UI in Azure](https://pichetodoitems.azurewebsites.net/swagger/index.html)
 
+API Availability Toggling without Restart or Deployment
+
 ## Overview
 
 This project is an ASP.NET Core API for managing to-do items. It supports CRUD operations and is designed to be deployed using Azure Web App with a CI/CD pipeline integrated with GitHub.
