@@ -13,7 +13,7 @@ This project is an ASP.NET Core API for managing to-do items. It supports CRUD o
 - Create a new to-do item.
 - Update an existing to-do item.
 - Delete a to-do item.
-- Enable/Disable APIs without re-deployment
+- Enable/Disable APIs without re-deployment or restart of the application.
 
 ## Prerequisites
 
