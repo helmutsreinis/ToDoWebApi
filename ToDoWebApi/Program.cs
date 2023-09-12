@@ -11,7 +11,7 @@ builder.Services.AddDbContext<TodoContext>();  // Add your DbContext as a servic
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<FeatureToggles>(builder.Configuration.GetSection("FeatureToggles"));
-
+builder.Services.AddSingleton<FeatureToggles>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

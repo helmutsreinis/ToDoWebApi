@@ -5,6 +5,43 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+    <h1>Feature Toggles for Todo API</h1>
+
+    <div id="featureContainer">
+        <!-- We'll use checkboxes to toggle features on/off -->
+        <label>
+            <input type="checkbox" id="EnableTodoGetAll"> Enable Todo GetAll
+        </label><br>
+        <label>
+            <input type="checkbox" id="EnableTodoGet"> Enable Todo Get
+        </label><br>
+        <label>
+            <input type="checkbox" id="EnableTodoCreation"> Enable Todo Creation
+        </label><br>
+        <label>
+            <input type="checkbox" id="EnableTodoDeletion"> Enable Todo Deletion
+        </label><br>
+        <label>
+            <input type="checkbox" id="EnableTodoPost"> Enable Todo Post
+        </label><br>
+        <label>
+            <input type="checkbox" id="EnableTodoPut"> Enable Todo Put
+        </label><br>
+        <button onclick="updateFeatures()">Update Features</button>
+    </div>
+
+    <table id="featureTable" border="1">
+        <thead>
+            <tr>
+                <th>Feature</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be populated here by JavaScript -->
+        </tbody>
+    </table>
+
     <h1>ToDo List</h1>
 
     <div>
@@ -45,20 +82,20 @@
     </div>
 
     <script>
-    // Define the API endpoint
-        const apiEndpoint = 'https://pichetodoitems.azurewebsites.net/api/Todo';
-        //const apiEndpoint = 'https://localhost:7226/api/Todo';
-    // Function to fetch all ToDos
-    function fetchToDos() {
-      $('#toDoList').empty();
-      $.get(apiEndpoint, function(data) {
-        data.forEach(function(item) {
-          $('#toDoList').append(`<li>ID: ${item.id}, Title: ${item.title}</li>`);
-        });
-      });
-    }
+        // Define the API endpoint
+        //const apiEndpoint = 'https://pichetodoitems.azurewebsites.net/api/Todo';
+        const apiEndpoint = 'https://localhost:7226/api/Todo';
+        // Function to fetch all ToDos
+        function fetchToDos() {
+            $('#toDoList').empty();
+            $.get(apiEndpoint, function (data) {
+                data.forEach(function (item) {
+                    $('#toDoList').append(`<li>ID: ${item.id}, Title: ${item.title}</li>`);
+                });
+            });
+        }
 
-    // Function to create a ToDo
+        // Function to create a ToDo
         function createToDo() {
             const id = parseInt($('#createId').val(), 10);
             const title = $('#createTitle').val();
@@ -79,35 +116,113 @@
             });
         }
 
-    // Function to update a ToDo
-    function updateToDo() {
-      const id = $('#updateId').val();
-      const title = $('#updateTitle').val();
-      $.ajax({
-        url: `${apiEndpoint}/${id}`,
-        type: 'PUT',
-        data: JSON.stringify({ title }),
-        contentType: 'application/json',
-        success: function() {
-          fetchToDos();
+        // Function to update a ToDo
+        function updateToDo() {
+            const id = $('#updateId').val();
+            const title = $('#updateTitle').val();
+            $.ajax({
+                url: `${apiEndpoint}/${id}`,
+                type: 'PUT',
+                data: JSON.stringify({ title }),
+                contentType: 'application/json',
+                success: function () {
+                    fetchToDos();
+                }
+            });
         }
-      });
-    }
 
-    // Function to delete a ToDo
-    function deleteToDo() {
-      const id = $('#deleteId').val();
-      $.ajax({
-        url: `${apiEndpoint}/${id}`,
-        type: 'DELETE',
-        success: function() {
-          fetchToDos();
+        // Function to delete a ToDo
+        function deleteToDo() {
+            const id = $('#deleteId').val();
+            $.ajax({
+                url: `${apiEndpoint}/${id}`,
+                type: 'DELETE',
+                success: function () {
+                    fetchToDos();
+                }
+            });
         }
-      });
-    }
 
-    // Initial fetch
-    fetchToDos();
+        function fetchFeatures() {
+            fetch(apiEndpoint + '/GetFeatures')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(features => {
+                    const tableBody = document.getElementById('featureTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = ''; // Clear existing rows
+
+                    for (const [key, value] of Object.entries(features)) {
+                        // Populate the table
+                        const newRow = tableBody.insertRow(-1);
+                        const cell1 = newRow.insertCell(0);
+                        const cell2 = newRow.insertCell(1);
+                        cell1.innerHTML = key;
+                        cell2.innerHTML = value ? 'Enabled' : 'Disabled';
+
+                        // Update checkboxes
+                        const checkbox = document.getElementById(key);
+                        if (checkbox) {
+                            checkbox.checked = value;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+
+        async function fetchFeaturesss() {
+            const response = await fetch(apiEndpoint + '/GetFeatures');
+            const features = await response.data;
+
+            // Populate table
+            const tableBody = document.getElementById('featureTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ""; // Clear existing rows
+
+            for (const [key, value] of Object.entries(features)) {
+                const newRow = tableBody.insertRow();
+                const cell1 = newRow.insertCell(0);
+                const cell2 = newRow.insertCell(1);
+                cell1.innerHTML = key;
+                cell2.innerHTML = value ? "Enabled" : "Disabled";
+
+                // Update checkboxes
+                document.getElementById(key).checked = value;
+            }
+        }
+
+        async function updateFeatures() {
+            const toggles = {
+                EnableTodoGetAll: document.getElementById('EnableTodoGetAll').checked,
+                EnableTodoGet: document.getElementById('EnableTodoGet').checked,
+                EnableTodoCreation: document.getElementById('EnableTodoCreation').checked,
+                EnableTodoDeletion: document.getElementById('EnableTodoDeletion').checked,
+                EnableTodoPost: document.getElementById('EnableTodoPost').checked,
+                EnableTodoPut: document.getElementById('EnableTodoPut').checked
+            };
+
+            const response = await fetch(apiEndpoint + '/ToggleFeatures', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(toggles)
+            });
+
+            if (response.ok) {
+                alert('Features updated successfully!');
+                fetchFeatures();
+            } else {
+                alert('Error updating features. Please try again.');
+            }
+        }
+        // Initial fetch
+        fetchFeatures();
+        fetchToDos();
     </script>
 </body>
 </html>

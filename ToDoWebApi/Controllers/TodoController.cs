@@ -49,17 +49,27 @@ namespace MyTodoApp.Controllers
         [HttpPost]
         public IActionResult Create(Todo todo)
         {
-            if (!_featureToggles.EnableTodoCreation)
+            try
             {
-                return BadRequest("Todo creation is disabled.");
-            }
-            if (todo == null || string.IsNullOrEmpty(todo.Title))
-            {
-                return BadRequest("Invalid todo item");
-            }
+                if (!_featureToggles.EnableTodoCreation)
+                {
+                    return BadRequest("Todo creation is disabled.");
+                }
+                if (todo == null || string.IsNullOrEmpty(todo.Title))
+                {
+                    return BadRequest("Invalid todo item");
+                }
 
-            _context.Todos.Add(todo);
-            _context.SaveChanges();
+                _context.Todos.Add(todo);
+                _context.SaveChanges();
+
+            }
+            catch
+            {
+
+                
+            }
+            
 
             return CreatedAtAction(nameof(Get), new { id = todo.Id }, todo);
         }
@@ -91,22 +101,50 @@ namespace MyTodoApp.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            if (!_featureToggles.EnableTodoDeletion)
+            try
             {
-                return BadRequest("Todo deletion is disabled.");
-            }
-            var todo = _context.Todos.Find(id);
-            if (todo == null)
-            {
-                return NotFound();
-            }
+                if (!_featureToggles.EnableTodoDeletion)
+                {
+                    return BadRequest("Todo deletion is disabled.");
+                }
+                var todo = _context.Todos.Find(id);
+                if (todo == null)
+                {
+                    return NotFound();
+                }
 
-            _context.Todos.Remove(todo);
-            _context.SaveChanges();
+                _context.Todos.Remove(todo);
+                _context.SaveChanges();
+            }
+            catch
+            {
+
+                return NotFound($"Item by Id {id} not found.");
+            }
+            
 
             return NoContent();
         }
 
-        
+        [HttpGet("GetFeatures")]
+        public ActionResult<FeatureToggles> GetFeatureToggles()
+        {
+            return Ok(_featureToggles);
+        }
+
+        [HttpPut("ToggleFeatures")]
+        public ActionResult UpdateFeatureToggles([FromBody] FeatureToggles toggles)
+        {
+            _featureToggles.EnableTodoCreation = toggles.EnableTodoCreation;
+            _featureToggles.EnableTodoDeletion = toggles.EnableTodoDeletion;
+            _featureToggles.EnableTodoGet = toggles.EnableTodoGet;
+            _featureToggles.EnableTodoGetAll = toggles.EnableTodoGetAll;
+            _featureToggles.EnableTodoPost = toggles.EnableTodoPost;
+            _featureToggles.EnableTodoPut = toggles.EnableTodoPut;
+            return Ok();
+        }
+
     }
+
+    
 }
